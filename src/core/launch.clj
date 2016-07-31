@@ -1,6 +1,6 @@
-(ns virgo.launch
-  (:require [virgo.core :as core]
-            [virgo.helper :as helper]))
+(ns core.launch
+  (:require [core.service :as service]
+            [core.helper :as helper]))
 
 (defonce start-pairs
   [["post" "/server/server/10002"]

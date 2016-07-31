@@ -1,4 +1,4 @@
-(ns virgo.helper
+(ns core.helper
   (:require [clojure.java.io :as jio]
             [clojure.string :as str]
             [org.httpkit.client :as client]
@@ -6,7 +6,7 @@
             [compojure.core :as comp]
             [org.httpkit.server :as http]
             [clout.core :as clout]
-            ;[clojure.tools.nrepl.server:as nrepl]
+            [clojure.tools.nrepl.server :as nrepl]
             [clojure.xml :as xml]
             [ring.util.response :as response]
             [ring.util.mime-type :as mime]))
@@ -49,7 +49,7 @@ you provide: " (if a (type a) "null (no value)"))))))
         (.mkdirs (.getParentFile (new java.io.File path))))
       (with-open [w (jio/writer path :append true)
                   out (new java.io.PrintWriter w)]
-        (.println out (str (java.util.Date);(.format (new java.text.SimpleDataFormat "yyyy-MM-dd HH:mm:ss") (java.util.Date))
+        (.println out (str (java.util.Date.);(.format (new java.text.SimpleDataFormat "yyyy-MM-dd HH:mm:ss") (java.util.Date))
                            " " (if (string? message) message (pr-str message))))
         (.flush out)))))
 
@@ -62,7 +62,7 @@ you provide: " (if a (type a) "null (no value)"))))))
   (primary-log (str "[request] "
                     (:remote-addr ring-request) " "
                     (name (:request-method ring-request))
-                    " " ring-request )));(java.net.URIDecode/decode (:uri ring-requst) "UTF-8"))))
+                    " " (:uri ring-request) )));(java.net.URIDecode/decode (:uri ring-requst) "UTF-8"))))
 
 ;;------------------------tunnel------------------------
 
@@ -84,7 +84,7 @@ you provide: " (if a (type a) "null (no value)"))))))
   ([ring-request]
     (let [uri (:uri ring-request) ;(java.net.URIDecoder.decode (:uri ring-request) "UTF-8")
           uri (if (.startsWith uri "/") uri (str "/" uri))]
-      ;(log-ring-request ring-request)
+      (log-ring-request ring-request)
       (@tunnel (assoc ring-request :uri uri))))
   ([method uri]
     (run-tunnel {:uri uri
@@ -153,3 +153,14 @@ you provide: " (if a (type a) "null (no value)"))))))
 
 (defn run-complete [name]
   (swap! runners dissoc name))
+
+;;------------------------nrepl------------------------
+
+(defonce repl (atom nil))
+
+(defn start-repl [port]
+  (nrepl/start-server :port (Long/parseLong (str port))))
+
+(defn stop-repl []
+  (when-not (nil? @repl)
+    (reset! repl nil)))
